@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>hlock · your agent setup, made portable</title>
+  <meta name="description" content="Pin your agent harness, models, MCP servers, skills, and config in a harness.lock. Version it, and rehydrate it anywhere.">
+  <meta name="theme-color" content="#07060b">
+  <link rel="canonical" href="https://www.hlock.ai/">
+  <meta property="og:title" content="hlock · your agent setup, made portable">
+  <meta property="og:description" content="Your agent setup took weeks to get right. hlock pins all of it in one harness.lock you commit to git, and brings it back anywhere.">
+  <meta property="og:url" content="https://www.hlock.ai/">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="ambient" aria-hidden="true"></canvas>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="nav">
+    <div class="wrap nav__inner">
+      <a class="brand" href="#top" aria-label="hlock home">
+        <img src="assets/logo-animated.svg" alt="" width="28" height="28">
+        <span>hlock</span>
+      </a>
+      <nav class="nav__links" aria-label="Main">
+        <a href="#problem">Why</a>
+        <a href="#workflow">How</a>
+        <a href="#better">Optimize</a>
+        <a href="https://docs.hlock.ai/">Docs</a>
+        <a class="nav__gh" href="https://github.com/unionai-oss/hlock" aria-label="GitHub">
+          <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          <span>GitHub</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ───────────────────────── HERO ───────────────────────── -->
+    <section class="hero wrap">
+      <div class="hero__copy">
+        <p class="eyebrow"><span class="dot"></span> The package manager for agent harnesses</p>
+        <h1>Your agent setup,<br><span class="grad">made portable.</span></h1>
+        <p class="lead">
+          Your agent is more than a model. It's a harness version, MCP servers, skills, plugins,
+          instruction files, and config you set up by hand on one machine.
+          <code>hlock</code> pins all of it in a <code>harness.lock</code> you commit to git,
+          and brings it back anywhere.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="https://docs.hlock.ai/getting-started/quickstart/">
+            Get started
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <button class="install" type="button" data-copy="pip install hlock" aria-label="Copy install command">
+            <span class="install__prompt">$</span>
+            <span class="install__cmd">pip install hlock</span>
+            <span class="install__icon" aria-hidden="true">
+              <svg class="i-copy" viewBox="0 0 24 24" width="15" height="15"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              <svg class="i-check" viewBox="0 0 24 24" width="15" height="15"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </button>
+        </div>
+        <p class="hero__works">Works with <b>Claude Code</b>, <b>Codex</b>, <b>Pi</b>, <b>OpenCode</b>, <b>Cursor</b>, <b>Gemini CLI</b> and <a href="https://docs.hlock.ai/guides/harnesses/">more</a>.</p>
+      </div>
+
+      <div class="hero__term">
+        <div class="term term--glow" id="hero-term">
+          <div class="term__bar">
+            <span class="term__dots"><i></i><i></i><i></i></span>
+            <span class="term__title">~/projects/my-app — zsh</span>
+          </div>
+          <pre class="term__body" aria-live="off"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────────────────── PROBLEM ───────────────────────── -->
+    <section class="section" id="problem">
+      <div class="wrap">
+        <p class="kicker">The problem</p>
+        <h2>It took you weeks to get your agent <span class="grad">just right</span>.<br>Now try doing it again.</h2>
+        <p class="sub">
+          The setup that makes your agent good is scattered across your home directory, hand-edited,
+          and invisible to git. It lives on exactly one machine: yours.
+        </p>
+
+        <div class="scatter" id="scatter" aria-label="Agent config scattered across dotfiles">
+          <div class="scatter__home">~</div>
+          <span class="chip" style="--x:8%;--y:14%;--d:0s">~/.claude/settings.json</span>
+          <span class="chip" style="--x:58%;--y:6%;--d:.6s">~/.claude.json <em>/mcpServers</em></span>
+          <span class="chip chip--md" style="--x:30%;--y:30%;--d:1.2s">CLAUDE.md</span>
+          <span class="chip chip--md" style="--x:72%;--y:34%;--d:.3s">AGENTS.md</span>
+          <span class="chip chip--skill" style="--x:4%;--y:52%;--d:.9s">skills/review-pr/</span>
+          <span class="chip chip--skill" style="--x:44%;--y:58%;--d:1.5s">~/.agents/skills/</span>
+          <span class="chip chip--mcp" style="--x:66%;--y:62%;--d:.2s">mcp · github (stdio)</span>
+          <span class="chip chip--mcp" style="--x:14%;--y:80%;--d:1.1s">mcp · linear (http)</span>
+          <span class="chip" style="--x:40%;--y:84%;--d:.4s">~/.codex/config.toml</span>
+          <span class="chip" style="--x:76%;--y:86%;--d:1.8s">~/.pi/agent/models.json</span>
+          <span class="chip chip--plugin" style="--x:20%;--y:4%;--d:1.4s">plugin · code-review@1.4.0</span>
+          <span class="chip chip--secret" style="--x:82%;--y:16%;--d:.7s">GITHUB_TOKEN=ghp_8kQ…</span>
+          <span class="chip" style="--x:2%;--y:34%;--d:1.6s">opencode.json</span>
+          <span class="chip chip--model" style="--x:52%;--y:42%;--d:.5s">model: opus</span>
+        </div>
+
+        <div class="pains">
+          <article class="pain">
+            <div class="pain__msg"><span class="avatar">🧑‍💻</span><p>“New laptop. Which MCP servers did I even have?”</p></div>
+            <h3>Works on my machine</h3>
+            <p>Your harness has no lockfile. Rebuilding it means archaeology through dotfiles and shell history.</p>
+          </article>
+          <article class="pain">
+            <div class="pain__msg"><span class="avatar">👩‍🔬</span><p>“How is your Claude so good? Can you send me your setup?”</p></div>
+            <h3>Unshareable</h3>
+            <p>The config that makes your agent good can't be reviewed, diffed, or handed to a teammate or a CI runner.</p>
+          </article>
+          <article class="pain">
+            <div class="pain__msg"><span class="avatar">🤖</span><p>“It worked yesterday. What changed?”</p></div>
+            <h3>Silent drift</h3>
+            <p>A plugin updates, a model default flips, a settings file gets edited. Nothing tells you.</p>
+          </article>
+          <article class="pain">
+            <div class="pain__msg"><span class="avatar">🔑</span><p>“I can't commit this. There's a token in it.”</p></div>
+            <h3>Secrets everywhere</h3>
+            <p>API keys sit inline next to the config you'd want to version, so none of it gets versioned.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────────────────── THE LOCK ───────────────────────── -->
+    <section class="section section--lock" id="lock">
+      <div class="wrap lockgrid">
+        <div class="lockgrid__copy">
+          <p class="kicker">The fix</p>
+          <h2>One file.<br><span class="grad">Every dependency.</span></h2>
+          <p class="sub">
+            <code>hlock pin</code> reads the harness you already use and writes everything it depends on
+            into <code>harness.lock</code>: versions, sources, digests. Hand-written skills and config
+            are vendored next to it in <code>.hlock/</code>, so the pair is self-contained.
+          </p>
+          <ul class="checks">
+            <li><b>Harness</b> version and install source</li>
+            <li><b>Models</b> per role, and where each came from</li>
+            <li><b>MCP servers</b>, normalized across config formats</li>
+            <li><b>Skills, plugins &amp; instructions</b>, each with a digest</li>
+            <li><b>Secrets</b> as placeholders, never values</li>
+          </ul>
+          <button class="replay" type="button" id="lock-replay">
+            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Replay
+          </button>
+        </div>
+
+        <div class="lockstage" id="lockstage">
+          <div class="lockstage__chips" aria-hidden="true">
+            <span class="fly" style="--sx:-38%;--sy:-40%">settings.json</span>
+            <span class="fly" style="--sx:30%;--sy:-44%">CLAUDE.md</span>
+            <span class="fly" style="--sx:-44%;--sy:-6%">mcp · github</span>
+            <span class="fly" style="--sx:40%;--sy:-12%">mcp · linear</span>
+            <span class="fly" style="--sx:-34%;--sy:30%">skills/review-pr</span>
+            <span class="fly" style="--sx:36%;--sy:26%">plugin · code-review</span>
+            <span class="fly" style="--sx:-10%;--sy:46%">model: opus</span>
+            <span class="fly" style="--sx:6%;--sy:-50%">~/.claude.json</span>
+          </div>
+          <div class="lockfile">
+            <div class="lockfile__tab">
+              <img src="assets/logo.svg" alt="" width="16" height="16">
+              harness.lock
+              <span class="lockfile__badge">kind = "pin"</span>
+            </div>
+<pre class="lockfile__body"><code><span class="l"><span class="c"># generated by harness-lock. Do not edit by hand.</span></span><span class="l"><span class="k">lock-version</span> = <span class="n">1</span></span><span class="l"><span class="k">kind</span> = <span class="s">"pin"</span></span><span class="l"> </span><span class="l"><span class="h">[harness]</span></span><span class="l"><span class="k">name</span>    = <span class="s">"claude-code"</span></span><span class="l"><span class="k">version</span> = <span class="s">"2.1.285"</span></span><span class="l"><span class="k">source</span>  = <span class="s">"brew-cask:claude-code@2.1.285"</span></span><span class="l"> </span><span class="l"><span class="h">[[llm]]</span></span><span class="l"><span class="k">role</span>     = <span class="s">"default"</span></span><span class="l"><span class="k">provider</span> = <span class="s">"anthropic"</span></span><span class="l"><span class="k">model</span>    = <span class="s">"opus"</span></span><span class="l"> </span><span class="l"><span class="h">[[tool]]</span></span><span class="l"><span class="k">name</span>   = <span class="s">"github"</span></span><span class="l"><span class="k">kind</span>   = <span class="s">"mcp"</span></span><span class="l"><span class="k">source</span> = <span class="s">"npm:@modelcontextprotocol/server-github"</span></span><span class="l"><span class="h">[tool.env]</span></span><span class="l"><span class="k">GITHUB_TOKEN</span> = <span class="s s--secret">"${HLOCK_SECRET_GITHUB_GITHUB_TOKEN}"</span></span><span class="l"> </span><span class="l"><span class="h">[[skill]]</span></span><span class="l"><span class="k">name</span>   = <span class="s">"review-pr"</span></span><span class="l"><span class="k">origin</span> = <span class="s">"local"</span></span><span class="l"><span class="k">digest</span> = <span class="s">"sha256:15754ae3867d…74df9e"</span></span><span class="l"> </span><span class="l"><span class="h">[[config]]</span></span><span class="l"><span class="k">path</span>     = <span class="s">"~/.claude.json"</span></span><span class="l"><span class="k">restore</span>  = <span class="s">"pointers"</span></span><span class="l"><span class="k">pointers</span> = [<span class="s">"/mcpServers"</span>]</span><span class="l"><span class="k">digest</span>   = <span class="s">"sha256:b33482f12e0f…ad94cb92"</span></span></code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────────────────── ANALOGY ───────────────────────── -->
+    <section class="section" id="analogy">
+      <div class="wrap">
+        <p class="kicker">Familiar by design</p>
+        <h2>You already know how this works.</h2>
+        <p class="sub">If you've used <code>uv</code>, <code>cargo</code>, or <code>npm</code>, you already know the shape of <code>hlock</code>.</p>
+        <div class="analogy">
+          <div class="analogy__row">
+            <code class="was">uv.lock · Cargo.lock</code><span class="arrow" aria-hidden="true"></span><code class="now">harness.lock</code>
+            <p>Every dependency of your harness, pinned and hashed.</p>
+          </div>
+          <div class="analogy__row">
+            <code class="was">pip freeze</code><span class="arrow" aria-hidden="true"></span><code class="now">hlock pin</code>
+            <p>Record the setup you already have. Re-pin as it grows.</p>
+          </div>
+          <div class="analogy__row">
+            <code class="was">--locked</code><span class="arrow" aria-hidden="true"></span><code class="now">hlock check</code>
+            <p>Show exactly what changed since the pin.</p>
+          </div>
+          <div class="analogy__row">
+            <code class="was">uv sync · npm ci</code><span class="arrow" aria-hidden="true"></span><code class="now">hlock sync</code>
+            <p>Rehydrate the locked setup on any machine.</p>
+          </div>
+          <div class="analogy__row">
+            <code class="was">uv run</code><span class="arrow" aria-hidden="true"></span><code class="now">hlock launch</code>
+            <p>Start a session on the locked setup, isolated from your config.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────────────────── WORKFLOW ───────────────────────── -->
+    <section class="section" id="workflow">
+      <div class="wrap">
+        <p class="kicker">The workflow</p>
+        <h2>Pin it. Check it. <span class="grad">Bring it anywhere.</span></h2>
+
+        <div class="flow">
+          <div class="flow__tabs" role="tablist" aria-label="hlock commands">
+            <button role="tab" class="flow__tab is-active" data-scene="pin" aria-selected="true">
+              <span class="flow__num">01</span><span class="flow__cmd">hlock pin</span><span class="flow__desc">Lock your current setup</span><span class="flow__bar"></span>
+            </button>
+            <button role="tab" class="flow__tab" data-scene="check" aria-selected="false">
+              <span class="flow__num">02</span><span class="flow__cmd">hlock check</span><span class="flow__desc">Catch drift</span><span class="flow__bar"></span>
+            </button>
+            <button role="tab" class="flow__tab" data-scene="sync" aria-selected="false">
+              <span class="flow__num">03</span><span class="flow__cmd">hlock sync</span><span class="flow__desc">Rehydrate on a new machine</span><span class="flow__bar"></span>
+            </button>
+            <button role="tab" class="flow__tab" data-scene="launch" aria-selected="false">
+              <span class="flow__num">04</span><span class="flow__cmd">hlock launch</span><span class="flow__desc">Run the locked harness</span><span class="flow__bar"></span>
+            </button>
+          </div>
+          <div class="term" id="flow-term">
+            <div class="term__bar">
+              <span class="term__dots"><i></i><i></i><i></i></span>
+              <span class="term__title" id="flow-title">laptop — zsh</span>
+            </div>
+            <pre class="term__body term__body--tall" aria-live="off"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────────────────── SECRETS ───────────────────────── -->
+    <section class="section" id="secrets">
+      <div class="wrap split">
+        <div>
+          <p class="kicker">Safe to commit</p>
+          <h2>Secrets stay out.<br><span class="grad">Always.</span></h2>
+          <p class="sub">
+            <code>pin</code> never writes a secret. API keys, tokens, auth headers, and
+            credential-looking values become <code>HLOCK_SECRET_*</code> placeholders.
+            You supply the values when you sync, and a real secret is never replaced with a placeholder.
+          </p>
+        </div>
+        <div class="redact" id="redact">
+          <div class="redact__pane">
+            <div class="redact__label">~/.claude.json</div>
+<pre><code><span class="p">"github"</span>: {
+  <span class="p">"command"</span>: <span class="s">"npx"</span>,
+  <span class="p">"env"</span>: {
+    <span class="p">"GITHUB_TOKEN"</span>: <span class="redact__val"><span class="redact__raw">"ghp_8kQx2LmZ0vYt…"</span><span class="redact__ph">"${HLOCK_SECRET_GITHUB_GITHUB_TOKEN}"</span></span>
+  }
+}</code></pre>
+          </div>
+          <div class="redact__status">
+            <span class="redact__lock">
+              <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V7a4 4 0 0 1 8 0v4" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </span>
+            <span class="redact__text">1 secret redacted · supplied as <code>HLOCK_SECRET_*</code> when syncing</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────────────────── ANYWHERE ───────────────────────── -->
+    <section class="section" id="anywhere">
+      <div class="wrap">
+        <p class="kicker">Rehydrate anywhere</p>
+        <h2>Same agent. <span class="grad">Any machine.</span></h2>
+        <p class="sub"><code>hlock sync</code> builds a plan: what's already satisfied, what it does for you, and the exact command for anything it can't.</p>
+        <div class="targets">
+          <article class="target">
+            <div class="target__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22"><rect x="3" y="4" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M1 20h22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+            <h3>A new laptop</h3>
+            <p>Clone the repo, sync, set your secrets. Your config, skills, and plugins land where the harness expects them.</p>
+            <pre class="snip"><span class="pr">$</span> git clone …/my-app &amp;&amp; cd my-app
+<span class="pr">$</span> hlock sync --install</pre>
+          </article>
+          <article class="target">
+            <div class="target__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 7l9-4 9 4-9 4-9-4z M3 12l9 4 9-4 M3 17l9 4 9-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </div>
+            <h3>An isolated env</h3>
+            <p>Like a virtualenv for your harness. Materialize the lock into its own config root and leave yours untouched.</p>
+            <pre class="snip"><span class="pr">$</span> hlock sync --prefix .hlock/env
+<span class="ok">✓</span> in sync at .hlock/env/claude-code/config</pre>
+          </article>
+          <article class="target">
+            <div class="target__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22"><rect x="2" y="10" width="20" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 10V7h3v3M10 10V5h3v5M14 10V7h3v3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+            </div>
+            <h3>A container</h3>
+            <p>Write a Docker build context with the restored config baked into the image's home. Ship your agent to CI or a cluster.</p>
+            <pre class="snip"><span class="pr">$</span> hlock sync --docker
+<span class="ok">✓</span> wrote .hlock/docker/pi/Dockerfile</pre>
+          </article>
+        </div>
+        <div class="agentskill">
+          <span class="agentskill__tag">tip</span>
+          <p>Some steps need a human, like installing an app or setting a secret. <code>hlock sync --skill</code> writes an Agent Skill from the plan, so any agent can finish the job for you.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────────────────── MAKE IT BETTER ───────────────────────── -->
+    <section class="section" id="better">
+      <div class="wrap">
+        <p class="kicker">Then make it better</p>
+        <h2>A locked harness is a <span class="grad">baseline</span>.</h2>
+        <p class="sub">Once your setup is reproducible, you can measure it. Every lock <code>hlock</code> resolves records its success rate, cost, and latency on your own tasks.</p>
+
+        <div class="better">
+          <article class="card card--wide">
+            <div class="card__head">
+              <code class="card__cmd">hlock resolve</code>
+              <span class="card__like">like <code>uv lock</code></span>
+            </div>
+            <h3>Find the best stack for your tasks</h3>
+            <p>Draft an eval pack from the sessions your agent already logged, list the models and harnesses to try in <code>harness.toml</code>, and lock the winner with its evidence.</p>
+            <div class="pareto" id="pareto" aria-label="Candidate stacks plotted by cost and success rate, with the selected one highlighted">
+              <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                  <linearGradient id="pf" x1="0" x2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#ec4899"/></linearGradient>
+                </defs>
+                <g class="pareto__grid">
+                  <line x1="40" y1="20" x2="40" y2="170"/><line x1="40" y1="170" x2="390" y2="170"/>
+                  <line x1="40" y1="95" x2="390" y2="95" class="pareto__thr"/>
+                </g>
+                <text x="392" y="90" class="pareto__lbl" text-anchor="end">success-rate ≥ 0.5</text>
+                <text x="215" y="194" class="pareto__axis" text-anchor="middle">cost →</text>
+                <text x="14" y="95" class="pareto__axis" text-anchor="middle" transform="rotate(-90 14 95)">success →</text>
+                <path class="pareto__front" d="M90 80 L170 52 L280 36 L360 30"/>
+                <g class="pareto__pts">
+                  <circle cx="70" cy="140" r="5" style="--i:0"/>
+                  <circle cx="120" cy="118" r="5" style="--i:1"/>
+                  <circle cx="210" cy="92" r="5" style="--i:2"/>
+                  <circle cx="170" cy="52" r="5" style="--i:3"/>
+                  <circle cx="280" cy="36" r="5" style="--i:4"/>
+                  <circle cx="330" cy="60" r="5" style="--i:5"/>
+                  <circle cx="360" cy="30" r="5" style="--i:6"/>
+                  <circle cx="250" cy="130" r="5" style="--i:7"/>
+                </g>
+                <circle class="pareto__win" cx="90" cy="80" r="7"/>
+                <circle class="pareto__ring" cx="90" cy="80" r="7"/>
+                <text x="102" y="76" class="pareto__pick">locked: min-cost</text>
+              </svg>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__head">
+              <code class="card__cmd">hlock tune</code>
+              <span class="card__like">like PGO</span>
+            </div>
+            <h3>Tune what's inside</h3>
+            <p>Go past model choice into prompts, hyperparameters, and fine-tuned small models, on your evals. Run locally, on a devbox, or lift trials to a Flyte cluster for GPUs.</p>
+<pre class="snip"><span class="pr">$</span> hlock tune --backend cluster --depth ft</pre>
+          </article>
+
+          <article class="card">
+            <div class="card__head">
+              <code class="card__cmd">hlock localize</code>
+              <span class="card__like">like cross-compiling</span>
+            </div>
+            <h3>Go local</h3>
+            <p>Turn any lock into an equivalent on an open-source harness and models served by Ollama or LM Studio. Your MCP servers, skills, and instructions come along.</p>
+<pre class="snip diff"><span class="m">- harness  claude-code</span>
+<span class="p">+ harness  opencode</span>
+<span class="m">- llm      anthropic:opus</span>
+<span class="p">+ llm      ollama:gemma3:12b</span></pre>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────────────────── HARNESSES ───────────────────────── -->
+    <section class="section section--tight" id="harnesses">
+      <div class="wrap">
+        <p class="kicker center">Bring your own harness</p>
+        <h2 class="center">Lock the agent you already use.</h2>
+      </div>
+      <div class="marquee" aria-label="Supported harnesses">
+        <div class="marquee__track">
+          <span>claude-code</span><span>codex</span><span>pi</span><span>opencode</span><span>cursor-agent</span><span>gemini-cli</span><span>hermes</span><span>copilot-cli</span><span>goose</span><span>amp</span><span>pydantic-ai</span><span>langgraph</span><span>openai-agents</span><span>claude-agent-sdk</span><span>google-adk</span><span>smolagents</span><span>crewai</span><span>deepagents</span>
+          <span aria-hidden="true">claude-code</span><span aria-hidden="true">codex</span><span aria-hidden="true">pi</span><span aria-hidden="true">opencode</span><span aria-hidden="true">cursor-agent</span><span aria-hidden="true">gemini-cli</span><span aria-hidden="true">hermes</span><span aria-hidden="true">copilot-cli</span><span aria-hidden="true">goose</span><span aria-hidden="true">amp</span><span aria-hidden="true">pydantic-ai</span><span aria-hidden="true">langgraph</span><span aria-hidden="true">openai-agents</span><span aria-hidden="true">claude-agent-sdk</span><span aria-hidden="true">google-adk</span><span aria-hidden="true">smolagents</span><span aria-hidden="true">crewai</span><span aria-hidden="true">deepagents</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────────────────── CTA ───────────────────────── -->
+    <section class="section cta" id="start">
+      <div class="wrap cta__inner">
+        <img class="cta__logo" src="assets/logo-animated.svg" alt="" width="72" height="72">
+        <h2>Lock it in under a minute.</h2>
+        <div class="quick">
+          <div class="quick__bar"><span>quickstart</span><button type="button" class="quick__copy" data-copy-target="quick-code">Copy</button></div>
+<pre id="quick-code"><span class="pr">$</span> pip install hlock
+<span class="pr">$</span> hlock pin                      <span class="c"># lock your current setup into harness.lock</span>
+<span class="pr">$</span> git add harness.lock .hlock/   <span class="c"># version it (secrets are placeholders)</span>
+<span class="pr">$</span> hlock check                    <span class="c"># see what changed since the pin</span>
+<span class="pr">$</span> hlock sync                     <span class="c"># on another machine: rehydrate it</span>
+<span class="pr">$</span> hlock launch                   <span class="c"># start a session on the locked setup</span></pre>
+        </div>
+        <div class="hero__actions center">
+          <a class="btn btn--primary" href="https://docs.hlock.ai/getting-started/quickstart/">Read the quickstart
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn--ghost" href="https://github.com/unionai-oss/hlock">Star on GitHub</a>
+        </div>
+        <p class="cta__meta">Open source · Apache-2.0 · Rust core with Python bindings · <code>pip</code>, <code>uv</code>, or <code>cargo add hlock</code></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <a class="brand" href="#top"><img src="assets/logo.svg" alt="" width="22" height="22"><span>hlock</span></a>
+      <nav aria-label="Footer">
+        <a href="https://docs.hlock.ai/">Docs</a>
+        <a href="https://docs.hlock.ai/reference/cli/">CLI reference</a>
+        <a href="https://github.com/unionai-oss/hlock/blob/main/SPEC.md">Spec</a>
+        <a href="https://pypi.org/project/hlock/">PyPI</a>
+        <a href="https://crates.io/crates/hlock">crates.io</a>
+        <a href="https://github.com/unionai-oss/hlock">GitHub</a>
+      </nav>
+      <p>Built by <a href="https://www.union.ai/">Union.ai</a></p>
+    </div>
+  </footer>
+
+  <script src="ambient.js" defer></script>
+  <script src="main.js" defer></script>
+</body>
+</html>
