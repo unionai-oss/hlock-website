@@ -1,5 +1,5 @@
-// Ambient background: a faint stream of dots that drifts across the page,
-// snaps into alignment on a lattice (the "lock"), holds for a beat, then releases and flows on.
+// Ambient background: faint dots float around freely, then snap into a regular grid
+// (the "lock"), hold for a beat, then release and drift apart again.
 (() => {
   "use strict";
   const canvas = document.getElementById("ambient");
@@ -7,12 +7,11 @@
   const ctx = canvas.getContext("2d");
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const CELL = 30;            // lattice spacing the dots lock onto
-  const FLOW = 7000, SNAP = 1300, HOLD = 2200, RELEASE = 1400;
-  const CYCLE = FLOW + SNAP + HOLD + RELEASE;
+  const FLOAT = 4500, SNAP = 1400, HOLD = 3200, RELEASE = 1400;
+  const CYCLE = FLOAT + SNAP + HOLD + RELEASE;
   const violet = [167, 139, 250], pink = [244, 114, 182];
 
-  let w = 0, h = 0, dpr = 1, particles = [];
+  let w = 0, h = 0, dpr = 1, particles = [], cols = 0, rows = 0, gap = 0;
   const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
   function resize() {
@@ -21,24 +20,29 @@
     canvas.width = w * dpr; canvas.height = h * dpr;
     canvas.style.width = w + "px"; canvas.style.height = h + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const count = Math.min(220, Math.round((w * h) / 7000));
-    particles = Array.from({ length: count }, () => {
-      const lane = Math.random() * h;
+    // one dot per grid cell, with square cells that cover the viewport
+    gap = Math.max(46, Math.sqrt((w * h) / 240));
+    cols = Math.ceil(w / gap); rows = Math.ceil(h / gap);
+    particles = Array.from({ length: cols * rows }, () => {
+      const ang = Math.random() * Math.PI * 2, v = 6 + Math.random() * 14;   // px/s
       return {
-        x: Math.random() * w, lane, y: lane,
-        v: 14 + Math.random() * 34,                 // px/s
-        amp: 4 + Math.random() * 10, ph: Math.random() * Math.PI * 2,
-        a: 0.05 + Math.random() * 0.12,
+        x: Math.random() * w, y: Math.random() * h,
+        vx: Math.cos(ang) * v, vy: Math.sin(ang) * v,
+        a: 0.06 + Math.random() * 0.12,
         r: 0.8 + Math.random() * 1.1,
-        sx: 0, sy: 0,
+        gx: 0, gy: 0, col: 0, row: 0,
       };
     });
+    assignGrid();
   }
 
-  function snapTargets() {
-    for (const p of particles) {
-      p.sx = Math.round(p.x / CELL) * CELL;
-      p.sy = Math.round(p.y / CELL) * CELL;
+  // Give each dot a grid slot near where it is: bucket by y into rows, then by x into columns.
+  function assignGrid() {
+    const ox = (w - (cols - 1) * gap) / 2, oy = (h - (rows - 1) * gap) / 2;
+    const byY = [...particles].sort((a, b) => a.y - b.y);
+    for (let r = 0; r < rows; r++) {
+      const row = byY.slice(r * cols, (r + 1) * cols).sort((a, b) => a.x - b.x);
+      row.forEach((p, c) => { p.row = r; p.col = c; p.gx = ox + c * gap; p.gy = oy + r * gap; });
     }
   }
 
@@ -48,45 +52,55 @@
     last = now;
     const t = (now - start) % CYCLE;
     let phase, k;                                   // k: 0 = free, 1 = locked
-    if (t < FLOW) { phase = "flow"; k = 0; }
-    else if (t < FLOW + SNAP) { phase = "snap"; k = ease((t - FLOW) / SNAP); }
-    else if (t < FLOW + SNAP + HOLD) { phase = "hold"; k = 1; }
-    else { phase = "release"; k = 1 - ease((t - FLOW - SNAP - HOLD) / RELEASE); }
-    if (phase === "snap" && prevPhase !== "snap") snapTargets();
+    if (t < FLOAT) { phase = "float"; k = 0; }
+    else if (t < FLOAT + SNAP) { phase = "snap"; k = ease((t - FLOAT) / SNAP); }
+    else if (t < FLOAT + SNAP + HOLD) { phase = "hold"; k = 1; }
+    else { phase = "release"; k = 1 - ease((t - FLOAT - SNAP - HOLD) / RELEASE); }
+    if (phase === "snap" && prevPhase !== "snap") assignGrid();
     prevPhase = phase;
 
-    const moving = phase === "flow" || phase === "release";
     ctx.clearRect(0, 0, w, h);
-    ctx.lineCap = "round";
+    const pos = new Array(particles.length);
 
-    for (const p of particles) {
-      if (moving) {
-        p.x += p.v * dt;
-        p.ph += dt * 0.8;
-        p.y = p.lane + Math.sin(p.ph) * p.amp;
-        if (p.x > w + 40) { p.x = -40; p.lane = Math.random() * h; }
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      // free motion keeps running underneath; a gentle wander keeps it from looking linear
+      const turn = (Math.random() - 0.5) * 0.6 * dt;
+      const c = Math.cos(turn), s = Math.sin(turn);
+      [p.vx, p.vy] = [p.vx * c - p.vy * s, p.vx * s + p.vy * c];
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      if (phase === "float") {                      // only wrap while free, so the snap never jumps
+        if (p.x < -20) p.x += w + 40; else if (p.x > w + 20) p.x -= w + 40;
+        if (p.y < -20) p.y += h + 40; else if (p.y > h + 20) p.y -= h + 40;
       }
-      const x = p.x + (p.sx - p.x) * k;
-      const y = p.y + (p.sy - p.y) * k;
+      pos[i] = [p.x + (p.gx - p.x) * k, p.y + (p.gy - p.y) * k];
+    }
+
+    // faint lattice lines fade in while the dots are locked
+    if (k > 0.6) {
+      const la = (k - 0.6) / 0.4 * 0.06;
+      const idx = new Map(particles.map((p, i) => [p.row * cols + p.col, i]));
+      ctx.strokeStyle = `rgba(167,139,250,${la.toFixed(3)})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      particles.forEach((p, i) => {
+        const right = idx.get(p.row * cols + p.col + 1), down = idx.get((p.row + 1) * cols + p.col);
+        if (p.col < cols - 1 && right !== undefined) { ctx.moveTo(...pos[i]); ctx.lineTo(...pos[right]); }
+        if (down !== undefined) { ctx.moveTo(...pos[i]); ctx.lineTo(...pos[down]); }
+      });
+      ctx.stroke();
+    }
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i], [x, y] = pos[i];
       const mix = Math.max(0, Math.min(1, x / w));
       const r = violet[0] + (pink[0] - violet[0]) * mix;
       const g = violet[1] + (pink[1] - violet[1]) * mix;
       const b = violet[2] + (pink[2] - violet[2]) * mix;
-      // fade toward the bottom so the stream stays out of the way of content
+      // fade toward the bottom so the dots stay out of the way of content
       const fall = 1 - Math.min(1, y / (h * 1.1)) * 0.55;
       const alpha = (p.a + k * 0.14) * fall;
-      const rgb = `${r | 0},${g | 0},${b | 0}`;
-      // a short trail while flowing; it collapses into a crisp point when locked
-      const trail = p.v * 0.6 * (1 - k);
-      if (trail > 1) {
-        ctx.strokeStyle = `rgba(${rgb},${(alpha * 0.45).toFixed(3)})`;
-        ctx.lineWidth = p.r * 1.2;
-        ctx.beginPath();
-        ctx.moveTo(x - trail, y - Math.cos(p.ph) * p.amp * 0.08 * trail);
-        ctx.lineTo(x, y);
-        ctx.stroke();
-      }
-      ctx.fillStyle = `rgba(${rgb},${Math.min(1, alpha * 1.6).toFixed(3)})`;
+      ctx.fillStyle = `rgba(${r | 0},${g | 0},${b | 0},${Math.min(1, alpha * 1.6).toFixed(3)})`;
       ctx.beginPath();
       ctx.arc(x, y, p.r + k * 0.5, 0, Math.PI * 2);
       ctx.fill();
@@ -98,7 +112,7 @@
   let raf;
   resize();
   window.addEventListener("resize", () => { resize(); if (reduced) drawStatic(); });
-  function drawStatic() { snapTargets(); start = performance.now() - (FLOW + SNAP); frame(performance.now()); }
+  function drawStatic() { start = performance.now() - (FLOAT + SNAP); prevPhase = "snap"; frame(performance.now()); }
   if (reduced) { drawStatic(); return; }
   raf = requestAnimationFrame(frame);
   document.addEventListener("visibilitychange", () => {
