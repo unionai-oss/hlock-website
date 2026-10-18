@@ -43,12 +43,12 @@
 
   const scenes = {
     hero: {
-      title: "~/projects/my-app — zsh",
+      title: "~/projects/my-app",
       steps: [
         { cmd: "hlock pin" },
-        { out: [ok("✓") + " pinned " + hi("claude-code 2.1.285") + " → harness.lock  " + dim("(the only installed harness)")] },
+        { out: [ok("✓") + " pinned " + hi("claude-code 2.1.285") + " → harness.lock  " + dim("(only harness installed)")] },
         { out: pinBox, gap: 45 },
-        { out: [mut("vendored 3 files into .hlock/vendor/claude-code/ · review before committing")] },
+        { out: [mut("vendored 3 files → .hlock/vendor/claude-code/ · review, then commit")] },
         { out: [arrow("next →") + " hlock check  ·  hlock sync"] },
         { wait: 900 },
         { cmd: 'git add harness.lock .hlock/ && git commit -qm "lock my agent"' },
@@ -163,6 +163,10 @@
     },
   };
 
+  // Widest line in a scene, in characters; the terminal scales its font to fit it.
+  const colsOf = (scene) => Math.max(...scene.steps.flatMap((s) =>
+    s.cmd ? [s.cmd.length + 2] : (s.out || []).map(plainLen)));
+
   // ── terminal player ────────────────────────────────────────────────────────
   class Player {
     constructor(el) {
@@ -176,6 +180,7 @@
       const alive = () => id === this.run;
       do {
         if (this.title && scene.title) this.title.textContent = scene.title;
+        this.body.style.setProperty("--cols", colsOf(scene) + 1);
         this.body.innerHTML = "";
         if (reduced) { this.renderStatic(scene); return; }
         for (const step of scene.steps) {
@@ -295,11 +300,16 @@
   const stage = document.getElementById("lockstage");
   if (stage) {
     stage.querySelectorAll(".lockfile__body .l").forEach((l, i) => l.style.setProperty("--i", i));
+    stage.querySelectorAll(".fly").forEach((f, i) => f.style.setProperty("--d", -i * 0.9 + "s"));
+    // let the scattered pieces float in place for a few seconds before they converge
+    const LINGER = 3000;
+    let pending;
     const lock = () => stage.classList.add("is-locked");
-    if (reduced) lock(); else onView(stage, () => setTimeout(lock, 500), 0.45);
+    if (reduced) lock(); else onView(stage, () => { pending = setTimeout(lock, LINGER); }, 0.45);
     document.getElementById("lock-replay")?.addEventListener("click", () => {
+      clearTimeout(pending);
       stage.classList.remove("is-locked");
-      setTimeout(lock, 900);
+      pending = setTimeout(lock, LINGER);
     });
   }
 
@@ -365,6 +375,108 @@
     const cmds = pre.textContent.split("\n").map((l) => l.replace(/^\$\s*/, "").replace(/\s+#.*$/, "").trim()).filter(Boolean);
     copy(cmds.join("\n"), b, "Copied");
   }));
+
+  // ── sign up modal (hlock cloud waitlist) ───────────────────────────────────
+  const signup = document.getElementById("signup");
+  if (signup) {
+    const opt = signup.querySelector(".pv--opt");
+    const reg = signup.querySelector(".pv--reg");
+    const trials = signup.querySelector(".pv__trials");
+    const query = signup.querySelector(".reg__query");
+    let timers = [];
+    const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+
+    // replay the product preview each time the modal opens
+    const playPreview = () => {
+      timers.forEach(clearTimeout); timers = [];
+      for (const pv of [opt, reg]) { pv.classList.remove("is-live", "is-done"); void pv.offsetWidth; }
+      const total = 48;
+      if (reduced) {
+        opt.classList.add("is-live", "is-done"); reg.classList.add("is-live");
+        trials.textContent = `${total} trials · done`; query.textContent = query.dataset.query;
+        return;
+      }
+      // registry first: type the search, show the results
+      query.textContent = "";
+      [...query.dataset.query].forEach((ch, i) => later(() => { query.textContent += ch; }, 400 + i * 85));
+      const found = 400 + query.dataset.query.length * 85 + 250;
+      later(() => reg.classList.add("is-live"), found);
+      // then optimization: run the trials and pick a winner
+      const go = found + 700;
+      trials.textContent = `trial 0 / ${total}`;
+      later(() => opt.classList.add("is-live"), go);
+      for (let n = 1; n <= total; n++) later(() => { trials.textContent = `trial ${n} / ${total}`; }, go + 300 + n * 62);
+      later(() => { opt.classList.add("is-done"); trials.textContent = `${total} trials · done`; }, go + 3500);
+    };
+
+    const open = () => {
+      if (signup.open) return;
+      signup.showModal();
+      playPreview();
+      signup.querySelector('input[name="email"]')?.focus();
+    };
+    document.querySelectorAll("[data-signup]").forEach((b) => b.addEventListener("click", open));
+    signup.querySelector("[data-signup-close]").addEventListener("click", () => signup.close());
+    signup.addEventListener("click", (e) => { if (e.target === signup) signup.close(); });   // backdrop
+    signup.addEventListener("close", () => { timers.forEach(clearTimeout); timers = []; });
+    if (location.hash === "#signup") open();
+
+    // Submits to a HubSpot form through the Forms API (no key needed; the ids are public).
+    const form = document.getElementById("waitlist");
+    const status = form.querySelector(".waitlist__status");
+    const submit = form.querySelector(".waitlist__submit");
+    const email = form.elements.email;
+    const hsUrl = `https://api.hsforms.com/submissions/v3/integration/submit/${form.dataset.hsPortal}/${form.dataset.hsForm}`;
+    const cookie = (name) => document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`))?.[1];
+    const field = (name, value) => ({ objectTypeId: "0-1", name, value });   // 0-1 = contact property
+    const post = (fields) => fetch(hsUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fields,
+        context: { pageUri: location.href, pageName: "hlock · waitlist", ...(cookie("hubspotutk") && { hutk: cookie("hubspotutk") }) },
+      }),
+    });
+
+    email.addEventListener("input", () => email.removeAttribute("aria-invalid"));
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      status.textContent = "";
+      if (!email.checkValidity()) {
+        email.setAttribute("aria-invalid", "true");
+        status.textContent = "Enter a valid email address.";
+        email.focus();
+        return;
+      }
+      if (form.elements.company_website.value) return;                    // honeypot: bots fill it in
+      const base = [field("email", email.value.trim())];
+      // HubSpot internal property names (labels: hlock-ai-harness, hlock-ai-interests)
+      const extra = [
+        field("harness", form.elements.harness.value),
+        field("hlockinterests", [...form.querySelectorAll('[name="interest"]:checked')].map((c) => c.value).join(";")),
+      ].filter((f) => f.value);
+      submit.disabled = true;
+      try {
+        let res = await post([...base, ...extra]);
+        // If the HubSpot form is missing a field (or rejects a value), still capture the email.
+        if (res.status === 400 && extra.length) res = await post(base);
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          if (err.errors?.some((x) => x.errorType === "INVALID_EMAIL")) {
+            email.setAttribute("aria-invalid", "true");
+            throw new Error("Enter a valid email address.");
+          }
+          throw new Error();
+        }
+        form.hidden = true;
+        signup.querySelector(".waitlist__done").hidden = false;
+      } catch (err) {
+        status.textContent = err.message || "Something went wrong. Please try again in a moment.";
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  }
 
   // ── nav border on scroll ───────────────────────────────────────────────────
   const nav = document.querySelector(".nav");
