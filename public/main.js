@@ -31,15 +31,98 @@
 
   // ── scenes: each is a list of steps ────────────────────────────────────────
   // { cmd } is typed; { out } lines appear one at a time; { wait } pauses.
-  const pinBox = box(hi("harness.lock · pinned"), [
-    kv("harness", "claude-code 2.1.285"),
-    kv("llm · default", "anthropic:opus"),
-    kv("mcp", "github (stdio), linear (http)"),
-    kv("skills", "3  (1 local, 2 third-party)"),
-    kv("plugins", "code-review@1.4.0"),
-    kv("config", "{root}/settings.json, ~/.claude.json /mcpServers"),
-    kv("secrets", "1 redacted  " + dim("(HLOCK_SECRET_* when syncing)")),
-  ]);
+
+  // The hero cycles through these harnesses, one pin → pull → sync round each. Paths follow
+  // each harness's profile in hlock (crates/harness-lock-core/profiles/harnesses/).
+  const harnesses = [
+    {
+      id: "claude-code", name: "Claude Code", version: "2.1.285", llm: "anthropic:opus", root: "~/.claude",
+      config: "{root}/settings.json, ~/.claude.json /mcpServers",
+      writes: ["~/.claude/settings.json", "~/.claude.json /mcpServers"],
+    },
+    {
+      id: "pi", name: "Pi", version: "1.0.0", llm: "openrouter:qwen/qwen3-coder", root: "~/.pi/agent",
+      config: "{root}/settings.json, {root}/mcp.json",
+      writes: ["~/.pi/agent/settings.json", "~/.pi/agent/mcp.json"],
+    },
+    {
+      id: "codex", name: "Codex CLI", version: "0.50.0", llm: "openai:gpt-5-codex", root: "~/.codex",
+      config: "{root}/config.toml",
+      writes: ["~/.codex/config.toml"],
+    },
+    {
+      id: "opencode", name: "OpenCode", version: "1.18.18", llm: "anthropic:claude-sonnet-4-5", root: "~/.config/opencode",
+      config: "{root}/opencode.json",
+      writes: ["~/.config/opencode/opencode.json"],
+    },
+    {
+      id: "hermes", name: "Hermes Agent", version: "0.20.0", llm: "nous:hermes-4-405b", root: "~/.hermes",
+      config: "{root}/config.yaml",
+      writes: ["~/.hermes/config.yaml"],
+    },
+  ];
+  const heroSkills = ["review-pr", "write-tests"];
+  const plan = (kind, title) => kind.padEnd(9) + title;
+
+  // Two scenes per harness, each a terminal on one machine: pin and push on a laptop, then
+  // pull and sync on a new one. The hero terminal swipes between them.
+  function heroScenes(h) {
+    const setup = [
+      kv("harness", `${h.id} ${h.version}`),
+      kv("llm · default", h.llm),
+      kv("mcp", "github (stdio), linear (http)"),
+      kv("skills", "2  (2 local)"),
+      kv("config", h.config),
+      kv("secrets", "1 redacted  " + dim("(supplied as HLOCK_SECRET_* when syncing)")),
+    ];
+    const copies = heroSkills.map((sk) => `Copy skill ${sk} → ${h.root}/skills/${sk}`);
+    const done = [...h.writes.map((w) => "Write " + w), ...copies];
+    return [
+      {
+        title: "laptop — ~/projects/my-app",
+        caption: `On your laptop: pin your ${h.name} setup into harness.lock, then push it to GitHub.`,
+        steps: [
+          { cmd: "hlock pin" },
+          { out: [ok("✓") + " pinned " + hi(`${h.id} ${h.version}`) + " → harness.lock  " + dim("(running inside it)")] },
+          { out: box(hi("harness.lock · pinned"), setup), gap: 45 },
+          { out: [mut(`vendored ${done.length} files into .hlock/vendor/${h.id}/  · review before committing`)] },
+          { out: [arrow("next →") + " hlock check  ·  hlock sync"] },
+          { wait: 900 },
+          { cmd: 'git add harness.lock .hlock/ && git commit -qm "lock my agent"' },
+          { cmd: "git push" },
+          { out: [dim("To ") + hi("github.com:you/my-app.git"), dim("   b259f53..4e1c9a2  main -> main")] },
+          { wait: 2200 },
+        ],
+      },
+      {
+        title: "new-laptop — ~",
+        caption: `On a new machine: pull the lock from GitHub, then sync it into ${h.root}.`,
+        steps: [
+          { cmd: "hlock pull github:you/my-app" },
+          { out: [ok("✓") + " pulled " + hi("github:you/my-app") + " @ 4e1c9a2 → you"] },
+          { out: box(hi("you · pinned"), [...setup, kv("pulled", "github:you/my-app @ 4e1c9a2")]), gap: 45 },
+          { out: [warn("!") + " starts MCP servers with: npx  " + mut("· review before syncing into your own config")] },
+          { wait: 900 },
+          { cmd: "export HLOCK_SECRET_GITHUB_GITHUB_TOKEN=ghp_…" },
+          { cmd: "hlock sync you --in-place --yes" },
+          { out: [hi("Sync plan") + ` for ${h.name} ${h.version} → your config ${h.root}`] },
+          {
+            out: [
+              ok("✓") + "  " + plan("harness", `${h.name} ${h.version}`),
+              ok("✓") + "  " + plan("mcp", "`npx` for MCP servers: github"),
+              ok("✓") + "  " + plan("secret", "HLOCK_SECRET_GITHUB_GITHUB_TOKEN (mcp github GITHUB_TOKEN)"),
+              ...h.writes.map((w) => auto("●") + "  " + plan("config", "Write " + w)),
+              ...copies.map((c) => auto("●") + "  " + plan("skill", c)),
+            ],
+            gap: 120,
+          },
+          { out: done.map((d) => ok("✓") + " " + d), gap: 160 },
+          { out: [ok("✓") + " in sync with ~/.hlock/pulls/you/harness.lock"] },
+          { wait: 3600 },
+        ],
+      },
+    ];
+  }
 
   // A checklist marker that a later { mark } step ticks off.
   const todo = (id) => `<span class="t-mark t-mut" data-m="${id}">○</span>`;
@@ -76,20 +159,6 @@
         { out: [arrow("→") + " agent verifies with " + hi("hlock check")] },
         { out: [ok("✓ in sync with harness.lock") + dim("  · job done")], gap: 300 },
         { wait: 4200 },
-      ],
-    },
-    hero: {
-      title: "~/projects/my-app",
-      steps: [
-        { cmd: "hlock pin" },
-        { out: [ok("✓") + " pinned " + hi("claude-code 2.1.285") + " → harness.lock  " + dim("(only harness installed)")] },
-        { out: pinBox, gap: 45 },
-        { out: [mut("vendored 3 files → .hlock/vendor/claude-code/ · review, then commit")] },
-        { out: [arrow("next →") + " hlock check  ·  hlock sync"] },
-        { wait: 900 },
-        { cmd: 'git add harness.lock .hlock/ && git commit -qm "lock my agent"' },
-        { out: [dim("[main 4e1c9a2] lock my agent · 5 files changed")] },
-        { wait: 3600 },
       ],
     },
     pin: {
@@ -299,8 +368,66 @@
   }
 
   // ── hero terminal ──────────────────────────────────────────────────────────
+  // Each harness gets two scenes (laptop, then new machine); the window swipes between them
+  // and the caption under it says what's happening.
   const heroTerm = document.getElementById("hero-term");
-  if (heroTerm) new Player(heroTerm).play(scenes.hero, { loop: true });
+  if (heroTerm) {
+    const all = harnesses.flatMap(heroScenes);
+    const player = new Player(heroTerm);
+    const caption = heroTerm.querySelector(".term__caption");
+    const always = () => true;
+    // Size the font to the widest line across every scene, so it doesn't jump between them.
+    player.body.style.setProperty("--cols", Math.max(...all.map(colsOf)) + 1);
+
+    const show = (i) => {
+      player.title.textContent = all[i].title;
+      caption.innerHTML = `<span class="term__step">${i % 2 + 1}/2</span>` + escape(all[i].caption);
+      player.body.innerHTML = "";
+    };
+    // Slide the window out to the left and a fresh one in from the right, like switching to
+    // another machine; `swap` runs while it's off screen.
+    const swipe = async (swap) => {
+      heroTerm.classList.add("is-leaving");
+      await sleep(450);
+      swap();
+      heroTerm.classList.remove("is-leaving");
+      heroTerm.classList.add("is-entering");
+      void heroTerm.offsetWidth;
+      heroTerm.classList.remove("is-entering");
+      await sleep(450);
+    };
+    const playSteps = async (scene) => {
+      for (const step of scene.steps) {
+        if (step.cmd) await player.type(step.cmd, always);
+        else if (step.out) {
+          for (const l of step.out) { player.line(l); await sleep(step.gap ?? 90); }
+          await sleep(180);
+        } else if (step.wait) await sleep(step.wait);
+      }
+    };
+
+    if (reduced) {
+      // No animation: print the first harness's two scenes in one window, each under its
+      // machine's name.
+      heroTerm.classList.add("is-static");
+      player.title.textContent = all[0].title;
+      caption.remove();
+      player.body.innerHTML = all.slice(0, 2).flatMap((sc, i) => [
+        ...(i ? ["", dim("# " + sc.title)] : []),
+        dim("# " + sc.caption),
+        ...sc.steps.flatMap((s) => s.cmd ? [span("t-pr", "$ ") + span("t-cmd", escape(s.cmd))] : s.out || []),
+      ]).join("\n");
+    } else {
+      (async () => {
+        show(0);
+        for (let i = 0; ; i = (i + 1) % all.length) {
+          await playSteps(all[i]);
+          const next = (i + 1) % all.length;
+          await swipe(() => show(next));
+        }
+      })();
+    }
+  }
 
   // ── meta harness terminal ──────────────────────────────────────────────────
   const metaTerm = document.getElementById("meta-term");

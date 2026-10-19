@@ -177,6 +177,15 @@ h1 { margin: 0; font-size: clamp(42px, 5.6vw, 70px); line-height: 1.02; letter-s
 }
 .term__body--tall { min-height: 420px; }
 @media (max-width: 560px) { .term__body { font-size: clamp(7px, (100cqi - 30px) / (var(--cols, 60) * .6), 11px); padding: 14px; min-height: 330px; } }
+/* Hero terminal: a fixed-height window that swipes left between machines, with a caption bar. */
+.hero__term { overflow-x: clip; }
+.term--swipe { transition: transform .45s cubic-bezier(.6,0,.4,1), opacity .45s ease; }
+.term--swipe.is-leaving { transform: translateX(-105%); opacity: 0; }
+.term--swipe.is-entering { transform: translateX(105%); opacity: 0; transition: none; }
+.term__body--hero { box-sizing: content-box; min-height: 0; height: calc(22 * 1.6em); overflow-y: hidden; }
+.term.is-static .term__body--hero { height: auto; }
+.term__caption { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid var(--line); background: rgba(255,255,255,.03); font-size: 13px; line-height: 1.4; color: #d9d4e8; }
+.term__step { flex: none; padding: 1px 8px; border-radius: 999px; background: linear-gradient(90deg, var(--violet), var(--pink)); font: 600 11px var(--mono); color: #fff; }
 .t-pr { color: var(--pink-2); }
 .t-cmd { color: #fff; }
 .t-ok { color: var(--green); }
