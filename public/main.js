@@ -41,7 +41,43 @@
     kv("secrets", "1 redacted  " + dim("(HLOCK_SECRET_* when syncing)")),
   ]);
 
+  // A checklist marker that a later { mark } step ticks off.
+  const todo = (id) => `<span class="t-mark t-mut" data-m="${id}">○</span>`;
+
   const scenes = {
+    meta: {
+      title: "~/projects/my-app",
+      steps: [
+        { cmd: "hlock meta run install" },
+        { out: [dim("▶ meta harness · built-in agent · job: install")] },
+        { wait: 300 },
+        { out: [arrow("→") + " agent reads the sync plan"] },
+        {
+          out: [
+            mut("  2 steps hlock can't do on its own:"),
+            "    " + todo("mcp") + " mcp server " + hi("github") + "    " + dim("needs npm"),
+            "    " + todo("plugin") + " plugin " + hi("code-review") + "   " + dim("needs the claude CLI"),
+          ],
+          gap: 220,
+        },
+        { wait: 700 },
+        { out: [warn("?") + " agent asks to run:", "    npm i -g @modelcontextprotocol/server-github", warn("  allow? [y/N] ")], gap: 140 },
+        { reply: "y" },
+        { out: ["  " + ok("✓") + " installed"] },
+        { mark: "mcp" },
+        { wait: 500 },
+        { out: [warn("?") + " agent asks to run:", "    claude plugin install code-review@1.4.0", warn("  allow? [y/N] ")], gap: 140 },
+        { reply: "y" },
+        { out: ["  " + ok("✓") + " installed"] },
+        { mark: "plugin" },
+        { wait: 500 },
+        { out: [arrow("→") + " agent runs " + hi("hlock sync --yes")] },
+        { out: ["  " + ok("✓") + " config, skills, and plugins restored"], gap: 400 },
+        { out: [arrow("→") + " agent verifies with " + hi("hlock check")] },
+        { out: [ok("✓ in sync with harness.lock") + dim("  · job done")], gap: 300 },
+        { wait: 4200 },
+      ],
+    },
     hero: {
       title: "~/projects/my-app",
       steps: [
@@ -193,7 +229,9 @@
               await sleep(step.gap ?? 90);
             }
             await sleep(180);
-          } else if (step.wait) await sleep(step.wait);
+          } else if (step.reply) await this.reply(step.reply, alive);
+          else if (step.mark) { this.mark(step.mark); await sleep(350); }
+          else if (step.wait) await sleep(step.wait);
         }
         if (!alive()) return;
         this.prompt(true);
@@ -205,8 +243,26 @@
       for (const step of scene.steps) {
         if (step.cmd) html.push(span("t-pr", "$ ") + span("t-cmd", escape(step.cmd)));
         if (step.out) html.push(...step.out);
+        if (step.reply) html[html.length - 1] += span("t-cmd", step.reply);
       }
       this.body.innerHTML = html.join("\n");
+      scene.steps.forEach((step) => step.mark && this.mark(step.mark));
+    }
+    // Tick off a todo() marker printed earlier.
+    mark(id) {
+      const m = this.body.querySelector(`[data-m="${id}"]`);
+      if (m) { m.textContent = "✓"; m.classList.add("is-done"); }
+    }
+    // Wait at a prompt on the current line, then type an answer.
+    async reply(text, alive) {
+      this.body.insertAdjacentHTML("beforeend", '<span class="t-cmd"></span><span class="cursor"></span>');
+      const all = this.body.querySelectorAll(".t-cmd");
+      const el = all[all.length - 1];
+      await sleep(900);
+      if (!alive()) return;
+      el.textContent = text;
+      await sleep(300);
+      this.removeCursor();
     }
     line(html) {
       this.removeCursor();
@@ -245,6 +301,10 @@
   // ── hero terminal ──────────────────────────────────────────────────────────
   const heroTerm = document.getElementById("hero-term");
   if (heroTerm) new Player(heroTerm).play(scenes.hero, { loop: true });
+
+  // ── meta harness terminal ──────────────────────────────────────────────────
+  const metaTerm = document.getElementById("meta-term");
+  if (metaTerm) onView(metaTerm, () => new Player(metaTerm).play(scenes.meta, { loop: true }), 0.4);
 
   // ── workflow tabs ──────────────────────────────────────────────────────────
   const flow = document.querySelector(".flow");
@@ -390,10 +450,9 @@
     const playPreview = () => {
       timers.forEach(clearTimeout); timers = [];
       for (const pv of [opt, reg]) { pv.classList.remove("is-live", "is-done"); void pv.offsetWidth; }
-      const total = 48;
       if (reduced) {
         opt.classList.add("is-live", "is-done"); reg.classList.add("is-live");
-        trials.textContent = `${total} trials · done`; query.textContent = query.dataset.query;
+        trials.textContent = "done"; query.textContent = query.dataset.query;
         return;
       }
       // registry first: type the search, show the results
@@ -403,10 +462,9 @@
       later(() => reg.classList.add("is-live"), found);
       // then optimization: run the trials and pick a winner
       const go = found + 700;
-      trials.textContent = `trial 0 / ${total}`;
+      trials.textContent = "running trials";
       later(() => opt.classList.add("is-live"), go);
-      for (let n = 1; n <= total; n++) later(() => { trials.textContent = `trial ${n} / ${total}`; }, go + 300 + n * 62);
-      later(() => { opt.classList.add("is-done"); trials.textContent = `${total} trials · done`; }, go + 3500);
+      later(() => { opt.classList.add("is-done"); trials.textContent = "done"; }, go + 3400);
     };
 
     const open = () => {
