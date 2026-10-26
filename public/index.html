@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=11">
+  <link rel="stylesheet" href="styles.css?v=12">
 </head>
 <body>
   <canvas id="ambient" aria-hidden="true"></canvas>
@@ -41,6 +41,7 @@
         <a href="#problem">Why</a>
         <a href="#workflow">How</a>
         <a href="#localize">Localize</a>
+        <a href="#migrate">Migrate</a>
         <a href="#better">Tune</a>
         <a class="nav__ext" href="https://docs.hlock.ai/" target="_blank" rel="noopener">Docs<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         <a class="nav__gh" href="https://github.com/unionai-oss/hlock" aria-label="Star on GitHub" target="_blank" rel="noopener">
@@ -121,22 +122,34 @@
 
         <div class="pains">
           <article class="pain">
-            <h3>Works on my machine</h3>
+            <div class="pain__head">
+              <span class="pain__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></span>
+              <h3>Works on my machine</h3>
+            </div>
             <p>Your harness has no lockfile. Rebuilding it means archaeology through dotfiles and shell history.</p>
             <div class="pain__msg"><p>“New laptop. Which MCP servers did I even have?”</p></div>
           </article>
           <article class="pain">
-            <h3>Unshareable</h3>
+            <div class="pain__head">
+              <span class="pain__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M17 9l5 5"/><path d="M22 9l-5 5"/></svg></span>
+              <h3>Unshareable</h3>
+            </div>
             <p>The config that makes your agent good can't be reviewed, diffed, or handed to a teammate or a CI runner.</p>
             <div class="pain__msg"><p>“How is your Claude so good? Can you send me your setup?”</p></div>
           </article>
           <article class="pain">
-            <h3>Silent drift</h3>
+            <div class="pain__head">
+              <span class="pain__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+              <h3>Silent drift</h3>
+            </div>
             <p>A plugin updates, a model default flips, a settings file gets edited. Nothing tells you.</p>
             <div class="pain__msg"><p>“It worked yesterday. What changed?”</p></div>
           </article>
           <article class="pain">
-            <h3>Secrets everywhere</h3>
+            <div class="pain__head">
+              <span class="pain__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></svg></span>
+              <h3>Secrets everywhere</h3>
+            </div>
             <p>API keys sit inline next to the config you'd want to version, so none of it gets versioned.</p>
             <div class="pain__msg"><p>“I can't commit this. There's a token in it.”</p></div>
           </article>
@@ -220,6 +233,21 @@
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- ───────────────────────── HARNESSES ───────────────────────── -->
+    <section class="section section--tight" id="harnesses">
+      <div class="wrap">
+        <p class="kicker center">Bring your own harness</p>
+        <h2 class="center">Lock the agent you already use.</h2>
+      </div>
+      <div class="marquee" aria-label="Supported harnesses">
+        <div class="marquee__track">
+          <span><svg aria-hidden="true"><use href="assets/harness-logos.svg#claude-code"/></svg>claude-code</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#codex"/></svg>codex</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#pi"/></svg>pi</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#opencode"/></svg>opencode</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#cursor"/></svg>cursor-agent</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#gemini-cli"/></svg>gemini-cli</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#hermes"/></svg>hermes</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#copilot"/></svg>copilot-cli</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#goose"/></svg>goose</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#amp"/></svg>amp</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#pydantic-ai"/></svg>pydantic-ai</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#langgraph"/></svg>langgraph</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#openai"/></svg>openai-agents</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#claude"/></svg>claude-agent-sdk</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#google"/></svg>google-adk</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#huggingface"/></svg>smolagents</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#crewai"/></svg>crewai</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#langchain"/></svg>deepagents</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#ollama"/></svg>ollama</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#lmstudio"/></svg>lm-studio</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#docker"/></svg>docker-model-runner</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#vllm"/></svg>vllm</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#trae"/></svg>trae</span>
+          <span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#claude-code"/></svg>claude-code</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#codex"/></svg>codex</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#pi"/></svg>pi</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#opencode"/></svg>opencode</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#cursor"/></svg>cursor-agent</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#gemini-cli"/></svg>gemini-cli</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#hermes"/></svg>hermes</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#copilot"/></svg>copilot-cli</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#goose"/></svg>goose</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#amp"/></svg>amp</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#pydantic-ai"/></svg>pydantic-ai</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#langgraph"/></svg>langgraph</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#openai"/></svg>openai-agents</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#claude"/></svg>claude-agent-sdk</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#google"/></svg>google-adk</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#huggingface"/></svg>smolagents</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#crewai"/></svg>crewai</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#langchain"/></svg>deepagents</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#ollama"/></svg>ollama</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#lmstudio"/></svg>lm-studio</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#docker"/></svg>docker-model-runner</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#vllm"/></svg>vllm</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#trae"/></svg>trae</span>
+        </div>
+      </div>
+      <p class="harness-more"><a class="card__link" href="https://docs.hlock.ai/reference/harnesses/" target="_blank" rel="noopener">See supported harnesses<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></p>
     </section>
 
     <!-- ───────────────────────── WORKFLOW ───────────────────────── -->
@@ -355,6 +383,50 @@
       </div>
     </section>
 
+    <!-- ───────────────────────── MIGRATE ───────────────────────── -->
+    <section class="section" id="migrate">
+      <div class="wrap split">
+        <div>
+          <p class="kicker">Lock without lock-in</p>
+          <h2>Feeling FOMO on<br><span class="grad">yet another new harness?</span></h2>
+          <p class="sub">
+            Every week there's a fresh harness — or a proprietary model gated behind one — and it
+            starts to out-shine yours. But your setup won't move. <code>hlock migrate</code> moves
+            the whole thing in one command: skills, MCP servers, and prompts rewritten to where the
+            new harness reads them, models mapped to a provider it supports.
+          </p>
+          <ul class="checks">
+            <li><b>Try it tonight</b> — a migrated lock runs in isolation before you commit</li>
+            <li><b>Skills &amp; instructions</b> move to the directories it reads (<code>CLAUDE.md</code> → <code>AGENTS.md</code>)</li>
+            <li><b>Models</b> remapped to a provider the new harness supports</li>
+            <li><b>Source lock untouched</b> — no risk switching back</li>
+          </ul>
+          <p class="metanote">
+            Any lock works as the source — pinned, resolved, tuned, or pulled. <code>hlock localize</code>
+            is just a migration that also goes local. Because the lock is a committed file, review what
+            moves with <code>hlock diff</code> before you switch.
+          </p>
+          <a class="card__link" href="https://docs.hlock.ai/guides/migrate/" target="_blank" rel="noopener">Read the <code>hlock migrate</code> guide<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+        <div class="term">
+          <div class="term__bar">
+            <span class="term__dots"><i></i><i></i><i></i></span>
+            <span class="term__title">~/projects/my-app</span>
+          </div>
+          <pre class="term__body term__body--migrate" aria-live="off"><span class="t-pr">$</span> <span class="t-cmd">hlock migrate --to codex</span>
+<span class="t-ok">✓</span> wrote <span class="t-box">harness.codex.lock</span> (from <span class="t-box">harness.lock</span>)
+
+<span class="t-box">⇄ harness.codex.lock</span> · migrated
+  <span class="t-dim">harness</span>  claude-code <span class="t-arrow">→</span> codex
+  <span class="t-dim">llm</span>      anthropic:opus <span class="t-arrow">→</span> openai:gpt-5.5
+  <span class="t-dim">carried</span>  2 MCP servers · 1 skill · 1 instruction
+
+<span class="t-dim">next</span> <span class="t-arrow">→</span> hlock sync harness.codex.lock
+<span class="t-dim">      →</span> hlock launch --lock harness.codex.lock</pre>
+        </div>
+      </div>
+    </section>
+
     <!-- ───────────────────────── META HARNESS ───────────────────────── -->
     <section class="section" id="meta">
       <div class="wrap split split--rev">
@@ -382,6 +454,48 @@
             <code>--local</code> for open-weight models. It asks before every command, or runs <code>--headless</code> against an allowlist.
           </p>
           <a class="card__link" href="https://docs.hlock.ai/guides/meta/" target="_blank" rel="noopener">Read the meta harness guide<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────────────────── TRUST & SAFETY ───────────────────────── -->
+    <section class="section" id="safety">
+      <div class="wrap split split--rev">
+        <div class="term">
+          <div class="term__bar">
+            <span class="term__dots"><i></i><i></i><i></i></span>
+            <span class="term__title">~/projects/my-app — CI</span>
+          </div>
+          <pre class="term__body term__body--safe" aria-live="off"><span class="t-pr">$</span> <span class="t-cmd">hlock check</span>          <span class="t-dim"># manifest ↔ lock in sync</span>
+<span class="t-ok">✓</span> harness.lock matches harness.toml
+
+<span class="t-pr">$</span> <span class="t-cmd">hlock audit --ci</span>
+<span class="t-bad">✗</span> SKILL.md:1:17  <span class="t-hi">U+202E</span>   <span class="t-dim">(hidden text)</span>
+<span class="t-ok">✓</span> 0 executables to approve · policy ok
+
+<span class="t-pr">$</span> <span class="t-cmd">hlock launch</span>
+<span class="t-ok">▶</span> Claude Code in <span class="t-auto">docker</span> (network open)
+    <span class="t-dim">--cap-drop=ALL · ~/ and /var/run/docker.sock never mounted</span></pre>
+        </div>
+        <div>
+          <p class="kicker">Trust &amp; containment</p>
+          <h2>It's a lock, but is it<br><span class="grad">safe to run?</span></h2>
+          <p class="sub">
+            A lock you pull from someone else is a program you're about to run. <code>hlock</code>
+            checks what a lock would place before you run it, then runs the agent where it can't
+            touch the rest of your machine.
+          </p>
+          <ul class="metajobs">
+            <li><code>audit</code><span>Scans for hidden characters and executables, enforces your <code>hlock-policy.toml</code>, and writes an SBOM.</span></li>
+            <li><code>sandbox</code><span>Runs the agent through Docker or OpenShell with no capabilities — your home dir and Docker socket are never mounted.</span></li>
+            <li><code>check --locked</code><span>Fails the build if <code>harness.toml</code> and <code>harness.lock</code> drift, like <code>uv sync --locked</code>. <code>audit --ci</code> emits SARIF for code scanning.</span></li>
+          </ul>
+          <p class="metanote">
+            The sandbox is recorded in the lock, so a teammate who pulls it gets the same one.
+            In a shared repo, each contributor keeps their own <code>harness.&lt;handle&gt;.lock</code>, and
+            <code>hlock diff</code> shows the text behind any digest that changed.
+          </p>
+          <a class="card__link" href="https://docs.hlock.ai/guides/audit/" target="_blank" rel="noopener">Read the audit &amp; sandbox guides<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         </div>
       </div>
     </section>
@@ -435,12 +549,24 @@
           <article class="card card--wide">
             <div class="card__head">
               <code class="card__cmd">hlock tune</code>
-              <span class="card__like">like PGO</span>
+              <span class="card__like">like <a class="card__like-link" href="https://en.wikipedia.org/wiki/Profile-guided_optimization" target="_blank" rel="noopener">PGO<svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></span>
             </div>
             <h3>Tune what's inside</h3>
             <p>Go past model choice into prompts, hyperparameters, and fine-tuned small models, on your evals. Run locally, on a devbox, or lift trials to a Flyte cluster for GPUs.</p>
 <pre class="snip card__aside"><span class="pr">$</span> hlock tune --backend cluster --depth ft</pre>
             <a class="card__link" href="https://docs.hlock.ai/guides/tune/" target="_blank" rel="noopener">Read the <code>hlock tune</code> guide<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </article>
+
+          <article class="card card--wide">
+            <div class="card__head">
+              <code class="card__cmd">hlock upgrade</code>
+              <span class="card__like">like <code>uv --upgrade</code></span>
+            </div>
+            <h3>Stay current, automatically</h3>
+            <p>New models and components come out all the time. <code>hlock upgrade</code> tells you which locked pieces have newer versions, re-measures the stack on your evals, and keeps the previous lock so you can roll back. If the success rate drops, it rolls back on its own.</p>
+<pre class="snip card__aside"><span class="pr">$</span> hlock upgrade --all --apply
+<span class="ok">✓</span> planner qwen-7b → qwen-32b</pre>
+            <a class="card__link" href="https://docs.hlock.ai/guides/upgrade/" target="_blank" rel="noopener">Read the <code>hlock upgrade</code> guide<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
           </article>
 
         </div>
@@ -455,20 +581,6 @@
             Auto-tune my harness
             <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ───────────────────────── HARNESSES ───────────────────────── -->
-    <section class="section section--tight" id="harnesses">
-      <div class="wrap">
-        <p class="kicker center">Bring your own harness</p>
-        <h2 class="center">Lock the agent you already use.</h2>
-      </div>
-      <div class="marquee" aria-label="Supported harnesses">
-        <div class="marquee__track">
-          <span><svg aria-hidden="true"><use href="assets/harness-logos.svg#claude-code"/></svg>claude-code</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#codex"/></svg>codex</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#pi"/></svg>pi</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#opencode"/></svg>opencode</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#cursor"/></svg>cursor-agent</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#gemini-cli"/></svg>gemini-cli</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#hermes"/></svg>hermes</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#copilot"/></svg>copilot-cli</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#goose"/></svg>goose</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#amp"/></svg>amp</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#pydantic-ai"/></svg>pydantic-ai</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#langgraph"/></svg>langgraph</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#openai"/></svg>openai-agents</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#claude"/></svg>claude-agent-sdk</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#google"/></svg>google-adk</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#huggingface"/></svg>smolagents</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#crewai"/></svg>crewai</span><span><svg aria-hidden="true"><use href="assets/harness-logos.svg#langchain"/></svg>deepagents</span>
-          <span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#claude-code"/></svg>claude-code</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#codex"/></svg>codex</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#pi"/></svg>pi</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#opencode"/></svg>opencode</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#cursor"/></svg>cursor-agent</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#gemini-cli"/></svg>gemini-cli</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#hermes"/></svg>hermes</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#copilot"/></svg>copilot-cli</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#goose"/></svg>goose</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#amp"/></svg>amp</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#pydantic-ai"/></svg>pydantic-ai</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#langgraph"/></svg>langgraph</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#openai"/></svg>openai-agents</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#claude"/></svg>claude-agent-sdk</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#google"/></svg>google-adk</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#huggingface"/></svg>smolagents</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#crewai"/></svg>crewai</span><span aria-hidden="true"><svg aria-hidden="true"><use href="assets/harness-logos.svg#langchain"/></svg>deepagents</span>
         </div>
       </div>
     </section>
